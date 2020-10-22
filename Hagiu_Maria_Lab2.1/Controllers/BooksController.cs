@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Hagiu_Maria_Lab2_1.Data;
 using Hagiu_Maria_Lab2_1.Models;
+using Hagiu_Maria_Lab2_1.Views;
 
 namespace Hagiu_Maria_Lab2_1.Controllers
 {
@@ -20,10 +19,47 @@ namespace Hagiu_Maria_Lab2_1.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder,string currentFilter,string searchString,int? pageNumber)
         {
-            return View(await _context.Books.ToListAsync());
-        }
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["TitleSortParm"] = String.IsNullOrEmpty(sortOrder)?"title_desc":"";
+            ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+            var books = from b in _context.Books
+
+                        select b;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                books = books.Where(s => s.Title.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "title_desc":
+                    books = books.OrderByDescending(b => b.Title);
+                    break;
+                case "Price":
+                    books = books.OrderBy(b => b.Price);
+                    break;
+                case "price_desc":
+                    books = books.OrderByDescending(b => b.Price);
+                    break;
+                default:
+                    books = books.OrderBy(b => b.Title);
+                    break;
+            }
+            int pageSize = 2;
+            return View(await PaginatedList<Book>.CreateAsync(books.AsNoTracking(), pageNumber ??1, pageSize));
+        } 
 
         // GET: Books/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -33,8 +69,7 @@ namespace Hagiu_Maria_Lab2_1.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Books
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var book = await _context.Books.Include(s => s.Orders).ThenInclude(e => e.Customer).AsNoTracking().FirstOrDefaultAsync(m => m.ID == id);
             if (book == null)
             {
                 return NotFound();
@@ -54,19 +89,31 @@ namespace Hagiu_Maria_Lab2_1.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Title,Author,Price")] Book book)
+        public async Task<IActionResult> Create([Bind("Title,Author,Price")] Book book)
         {
-            if (ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    if (ModelState.IsValid)
+                    {
+                        _context.Add(book);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                }
+                catch (DbUpdateException /* ex*/)
+                {
+
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists ");
+                }
+                return View(book);
             }
-            return View(book);
         }
 
-        // GET: Books/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+            // GET: Books/Edit/5
+            public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -81,43 +128,36 @@ namespace Hagiu_Maria_Lab2_1.Controllers
             return View(book);
         }
 
-        // POST: Books/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Author,Price")] Book book)
-        {
-            if (id != book.ID)
-            {
-                return NotFound();
-            }
+            // POST: Books/Edit/5
+            // To protect from overposting attacks, enable the specific properties you want to bind to, for 
+            // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost, ActionName("Edit")]
 
-            if (ModelState.IsValid)
+            [ValidateAntiForgeryToken]
+            public async Task<IActionResult> EditPost(int? id)
             {
-                try
+                if (id == null)
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                var studentToUpdate = await _context.Books.FirstOrDefaultAsync(s => s.ID == id);
+                if (await TryUpdateModelAsync<Book>(studentToUpdate,"",s => s.Author, s => s.Title, s => s.Price))
                 {
-                    if (!BookExists(book.ID))
+                    try
                     {
-                        return NotFound();
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
                     }
-                    else
+                    catch (DbUpdateException /* ex */)
                     {
-                        throw;
+                        ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists");
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return View(studentToUpdate);
             }
-            return View(book);
-        }
-
         // GET: Books/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
         {
             if (id == null)
             {
@@ -125,10 +165,16 @@ namespace Hagiu_Maria_Lab2_1.Controllers
             }
 
             var book = await _context.Books
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (book == null)
             {
                 return NotFound();
+            }
+            if (saveChangesError.GetValueOrDefault())
+            {
+                ViewData["ErrorMessage"] =
+                "Delete failed. Try again";
             }
 
             return View(book);
@@ -140,9 +186,21 @@ namespace Hagiu_Maria_Lab2_1.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            _context.Books.Remove(book);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (book == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            try
+            {
+                _context.Books.Remove(book);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateException /* ex */)
+            {
+
+                return RedirectToAction(nameof(Delete), new { id = id, saveChangesError = true });
+            }
         }
 
         private bool BookExists(int id)
