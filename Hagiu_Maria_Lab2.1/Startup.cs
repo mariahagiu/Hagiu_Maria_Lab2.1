@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Hagiu_Maria_Lab2_1.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Policy;
 
 namespace Hagiu_Maria_Lab2._1
 {
@@ -57,13 +58,23 @@ namespace Hagiu_Maria_Lab2._1
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-         
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
+
                     template: "{controller=home}/{action=index}/{id?}");
-            });
+                routes.MapRoute(
+                  name: "books",
+
+                  template: "{controller=books}/{action=index}/{id?}");
+
+
+            }
+
+            );
+
         }
     }
 }
