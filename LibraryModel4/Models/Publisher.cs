@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
-namespace Hagiu_Maria_Lab2_1.Models
+namespace LibraryModel.Models
 {
     public class Publisher
     {

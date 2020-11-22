@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Hagiu_Maria_Lab2_1.Data;
-using Hagiu_Maria_Lab2_1.Models;
 using Hagiu_Maria_Lab2_1.Views;
+using LibraryModel.Data;
+using LibraryModel.Models;
 
 namespace Hagiu_Maria_Lab2_1.Controllers
 {

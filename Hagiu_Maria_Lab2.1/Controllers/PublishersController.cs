@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Hagiu_Maria_Lab2_1.Data;
-using Hagiu_Maria_Lab2_1.Models;
+using LibraryModel.Data;
+using LibraryModel.Models;
 using Hagiu_Maria_Lab2_1.Models.LibraryViewModels;
+
+
 namespace Hagiu_Maria_Lab2_1.Controllers
 {
     public class PublishersController : Controller

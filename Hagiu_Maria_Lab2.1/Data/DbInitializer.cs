@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Hagiu_Maria_Lab2_1.Models;
+
+using LibraryModel.Data;
+using LibraryModel.Models;
 
 namespace Hagiu_Maria_Lab2_1.Data
 {
@@ -15,7 +17,7 @@ namespace Hagiu_Maria_Lab2_1.Data
             {
                 return; // BD a fost creata anterior
             }
-            var books = new Book[]
+            var books = new LibraryModel.Models.Book[]
             {
                  new Book{Title="Baltagul",Author="Mihail Sadoveanu",Price=Decimal.Parse("22")},
                  new Book{Title="Enigma Otiliei",Author="George Calinescu",Price=Decimal.Parse("18")},

@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Hagiu_Maria_Lab2_1.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Policy;
+using LibraryModel.Data;
 
 namespace Hagiu_Maria_Lab2._1
 {
@@ -63,16 +64,12 @@ namespace Hagiu_Maria_Lab2._1
             {
                 routes.MapRoute(
                     name: "default",
+                    template: "{controller=Home}/{action=Index}/{id?}");
 
-                    template: "{controller=home}/{action=index}/{id?}");
                 routes.MapRoute(
-                  name: "books",
-
-                  template: "{controller=books}/{action=index}/{id?}");
-
-
+                    name: "customers",
+                    template: "{controller=Customers}/{action=Index}/{id?}");
             }
-
             );
 
         }

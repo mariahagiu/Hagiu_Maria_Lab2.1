@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Hagiu_Maria_Lab2_1.Data;
+using LibraryModel.Data;
 
 namespace Hagiu_Maria_Lab2._1
 {

@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Hagiu_Maria_Lab2._1.Models;
 using Microsoft.EntityFrameworkCore;
-using Hagiu_Maria_Lab2_1.Data; 
 using Hagiu_Maria_Lab2_1.Models.LibraryViewModels;
+using LibraryModel.Data;
 
 namespace Hagiu_Maria_Lab2._1.Controllers
 {
