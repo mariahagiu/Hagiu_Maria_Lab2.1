@@ -13,6 +13,10 @@ using Hagiu_Maria_Lab2_1.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Policy;
 using LibraryModel.Data;
+using Hagiu_Maria_Lab2_1.Hubs;
+
+
+
 
 namespace Hagiu_Maria_Lab2._1
 {
@@ -41,6 +45,7 @@ namespace Hagiu_Maria_Lab2._1
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddMvc(options => options.EnableEndpointRouting = false);
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,18 +65,23 @@ namespace Hagiu_Maria_Lab2._1
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            app.UseMvc(routes =>
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller=Home}/{action=Index}/{id?}");
+            //    endpoints.MapHub<ChatHub>("/chathub");
+            //}
+            //);
+            app.UseRouting();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapRoute(
-                    name: "customers",
-                    template: "{controller=Customers}/{action=Index}/{id?}");
-            }
-            );
-
+                endpoints.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chathub");
+            });
         }
     }
 }
