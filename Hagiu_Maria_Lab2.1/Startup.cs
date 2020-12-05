@@ -74,6 +74,7 @@ namespace Hagiu_Maria_Lab2._1
             //}
             //);
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
@@ -81,6 +82,7 @@ namespace Hagiu_Maria_Lab2._1
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<ChatHub>("/chathub");
+                endpoints.MapRazorPages();
             });
         }
     }
