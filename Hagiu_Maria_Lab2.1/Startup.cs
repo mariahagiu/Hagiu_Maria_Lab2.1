@@ -83,6 +83,10 @@ namespace Hagiu_Maria_Lab2._1
                 pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<ChatHub>("/chathub");
                 endpoints.MapRazorPages();
+                endpoints.MapControllerRoute(
+                name: "ljfdl",
+                pattern: "{controller=CustomersGrpc}/{action=Index}/{id?}");
+                
             });
         }
     }
